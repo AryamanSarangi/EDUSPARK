@@ -53,3 +53,6 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server is now running on port ${PORT}`);
 });
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
