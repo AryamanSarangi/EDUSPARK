@@ -16,11 +16,11 @@ const MONGO_URI = process.env.MONGO_URI;
 
 app.use(
   cors({
-    origin: 'http://localhost:5173',
-    methods: ["GET", "POST", "DELETE", "PUT"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: ["http://localhost:5173", "https://eduspark2.netlify.app"], // ✅ add your Netlify URL
+    credentials: true,
   })
 );
+
 
 app.use(express.json());
 
