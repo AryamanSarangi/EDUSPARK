@@ -1,37 +1,3 @@
-const User = require("../../models/User");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-
-const registerUser = async (req, res) => {
-  const { userName, userEmail, password, role } = req.body;
-
-  const existingUser = await User.findOne({
-    $or: [{ userEmail }, { userName }],
-  });
-
-  if (existingUser) {
-    return res.status(400).json({
-      success: false,
-      message: "User name or user email already exists",
-    });
-  }
-
-  const hashPassword = await bcrypt.hash(password, 10);
-  const newUser = new User({
-    userName,
-    userEmail,
-    role,
-    password: hashPassword,
-  });
-
-  await newUser.save();
-
-  return res.status(201).json({
-    success: true,
-    message: "User registered successfully!",
-  });
-};
-
 const loginUser = async (req, res) => {
   const { userEmail, password } = req.body;
 
@@ -44,6 +10,7 @@ const loginUser = async (req, res) => {
     });
   }
 
+  // ✅ Use your actual secret key from .env
   const accessToken = jwt.sign(
     {
       _id: checkUser._id,
@@ -51,15 +18,23 @@ const loginUser = async (req, res) => {
       userEmail: checkUser.userEmail,
       role: checkUser.role,
     },
-    "JWT_SECRET",
+    process.env.JWT_SECRET, // ✅ Don't use hardcoded "JWT_SECRET"
     { expiresIn: "120m" }
   );
 
+  // ✅ Set token in secure cookie
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: true,         // ✅ Required for HTTPS (Netlify + Render)
+    sameSite: "None",     // ✅ Required for cross-origin requests
+    maxAge: 2 * 60 * 60 * 1000, // 2 hours
+  });
+
+  // ✅ Respond with user data (no need to return the token again)
   res.status(200).json({
     success: true,
     message: "Logged in successfully",
     data: {
-      accessToken,
       user: {
         _id: checkUser._id,
         userName: checkUser.userName,
@@ -69,5 +44,3 @@ const loginUser = async (req, res) => {
     },
   });
 };
-
-module.exports = { registerUser, loginUser };
