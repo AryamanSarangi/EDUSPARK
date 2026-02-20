@@ -115,8 +115,12 @@ export async function mediaBulkUploadService(formData, onProgressCallback) {
   return data;
 }
 
-export async function fetchStudentViewCourseListService(query) {
-  const { data } = await axiosInstance.get(`/student/courses/get?${query}`);
+export async function fetchStudentViewCourseListService(query, studentId) {
+  const url = new URLSearchParams(query);
+  if (studentId) {
+    url.set("studentId", studentId);
+  }
+  const { data } = await axiosInstance.get(`/student/courses/get?${url}`);
 
   return data;
 }
@@ -143,6 +147,16 @@ export async function createPaymentService(formData) {
   return data;
 }
 
+export async function createRazorpayOrderService(payload) {
+  const { data } = await axiosInstance.post(`/student/order/create`, payload);
+  return data;
+}
+
+export async function verifyRazorpayPaymentService(payload) {
+  const { data } = await axiosInstance.post(`/student/order/verify`, payload);
+  return data;
+}
+
 export async function captureAndFinalizePaymentService(
   paymentId,
   payerId,
@@ -162,6 +176,22 @@ export async function fetchStudentBoughtCoursesService(studentId) {
     `/student/my-courses/get/${studentId}`
   );
 
+  return data;
+}
+
+export async function dropCourseService(studentId, courseId) {
+  const { data } = await axiosInstance.delete(
+    `/student/my-courses/drop/${studentId}/${courseId}`
+  );
+
+  return data;
+}
+
+export async function enrollCourseService(studentId, courseId) {
+  const { data } = await axiosInstance.post(`/student/course/enroll`, {
+    studentId,
+    courseId,
+  });
   return data;
 }
 

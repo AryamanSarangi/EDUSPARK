@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
-import { fetchStudentBoughtCoursesService } from "@/services";
-import { Watch } from "lucide-react";
-import { useContext, useEffect } from "react";
+import { fetchStudentBoughtCoursesService, dropCourseService } from "@/services";
+import { Watch, Trash2 } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function StudentCoursesPage() {
@@ -12,17 +12,35 @@ function StudentCoursesPage() {
   const { studentBoughtCoursesList, setStudentBoughtCoursesList } =
     useContext(StudentContext);
   const navigate = useNavigate();
+  const [droppingId, setDroppingId] = useState(null);
 
   async function fetchStudentBoughtCourses() {
     const response = await fetchStudentBoughtCoursesService(auth?.user?._id);
     if (response?.success) {
       setStudentBoughtCoursesList(response?.data);
     }
-    console.log(response);
   }
+
+  async function handleDropCourse(courseId, courseTitle) {
+    if (!window.confirm(`Are you sure you want to drop "${courseTitle}"? You will lose access to this course.`)) {
+      return;
+    }
+    setDroppingId(courseId);
+    try {
+      const response = await dropCourseService(auth?.user?._id, courseId);
+      if (response?.success) {
+        setStudentBoughtCoursesList(response?.data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDroppingId(null);
+    }
+  }
+
   useEffect(() => {
     fetchStudentBoughtCourses();
-  }, []);
+  }, [auth?.user?._id]);
 
   return (
     <div className="p-4">
@@ -30,7 +48,7 @@ function StudentCoursesPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {studentBoughtCoursesList && studentBoughtCoursesList.length > 0 ? (
           studentBoughtCoursesList.map((course) => (
-            <Card key={course.id} className="flex flex-col">
+            <Card key={course?.courseId || course?.id} className="flex flex-col">
               <CardContent className="p-4 flex-grow">
                 <img
                   src={course?.courseImage}
@@ -42,7 +60,7 @@ function StudentCoursesPage() {
                   {course?.instructorName}
                 </p>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex gap-2">
                 <Button
                   onClick={() =>
                     navigate(`/course-progress/${course?.courseId}`)
@@ -51,6 +69,18 @@ function StudentCoursesPage() {
                 >
                   <Watch className="mr-2 h-4 w-4" />
                   Start Watching
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDropCourse(course?.courseId, course?.title);
+                  }}
+                  disabled={droppingId === course?.courseId}
+                  title="Drop course"
+                >
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </CardFooter>
             </Card>

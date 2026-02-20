@@ -13,6 +13,7 @@ import StudentViewCourseDetailsPage from "./pages/student/course-details";
 import PaypalPaymentReturnPage from "./pages/student/payment-return";
 import StudentCoursesPage from "./pages/student/student-courses";
 import StudentViewCourseProgressPage from "./pages/student/course-progress";
+import PaymentPage from "./pages/student/payment";
 
 function App() {
   const { auth } = useContext(AuthContext);
@@ -77,6 +78,7 @@ function App() {
           element={<StudentViewCourseDetailsPage />}
         />
         <Route path="payment-return" element={<PaypalPaymentReturnPage />} />
+        <Route path="payment/:courseId" element={<PaymentPage />} />
         <Route path="student-courses" element={<StudentCoursesPage />} />
         <Route
           path="course-progress/:id"

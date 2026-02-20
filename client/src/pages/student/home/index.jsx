@@ -29,7 +29,8 @@ function StudentHomePage() {
   }
 
   async function fetchAllStudentViewCourses() {
-    const response = await fetchStudentViewCourseListService();
+    const query = "";
+    const response = await fetchStudentViewCourseListService(query, auth?.user?._id);
     if (response?.success) setStudentViewCoursesList(response?.data);
   }
 
@@ -50,7 +51,7 @@ function StudentHomePage() {
 
   useEffect(() => {
     fetchAllStudentViewCourses();
-  }, []);
+  }, [auth?.user?._id]);
 
   return (
     <div className="min-h-screen bg-white">

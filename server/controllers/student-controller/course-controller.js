@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Course = require("../../models/Course");
 const StudentCourses = require("../../models/StudentCourses");
 
@@ -8,9 +9,8 @@ const getAllStudentViewCourses = async (req, res) => {
       level = [],
       primaryLanguage = [],
       sortBy = "price-lowtohigh",
+      studentId,
     } = req.query;
-
-    console.log(req.query, "req.query");
 
     let filters = {};
     if (category.length) {
@@ -21,6 +21,18 @@ const getAllStudentViewCourses = async (req, res) => {
     }
     if (primaryLanguage.length) {
       filters.primaryLanguage = { $in: primaryLanguage.split(",") };
+    }
+
+    if (studentId) {
+      const studentCourses = await StudentCourses.findOne({ userId: studentId });
+      if (studentCourses?.courses?.length) {
+        const enrolledObjectIds = studentCourses.courses
+          .filter((c) => c.courseId && mongoose.Types.ObjectId.isValid(c.courseId))
+          .map((c) => new mongoose.Types.ObjectId(c.courseId));
+        if (enrolledObjectIds.length) {
+          filters._id = { $nin: enrolledObjectIds };
+        }
+      }
     }
 
     let sortParam = {};

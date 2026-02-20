@@ -19,7 +19,7 @@ import {
   markLectureAsViewedService,
   resetCourseProgressService,
 } from "@/services";
-import { Check, ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Play, Award } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import { useNavigate, useParams } from "react-router-dom";
@@ -229,16 +229,39 @@ function StudentViewCourseProgressPage() {
         </DialogContent>
       </Dialog>
       <Dialog open={showCourseCompleteDialog}>
-        <DialogContent showOverlay={false} className="sm:w-[425px]">
+        <DialogContent showOverlay={false} className="sm:w-[500px]">
           <DialogHeader>
-            <DialogTitle>Congratulations!</DialogTitle>
-            <DialogDescription className="flex flex-col gap-3">
-              <Label>You have completed the course</Label>
-              <div className="flex flex-row gap-3">
-                <Button onClick={() => navigate("/student-courses")}>
+            <DialogTitle className="flex items-center gap-2">
+              <Award className="h-6 w-6 text-yellow-500" />
+              Congratulations!
+            </DialogTitle>
+            <DialogDescription className="flex flex-col gap-4">
+              <Label className="text-base">
+                You have completed the course. Your certificate is ready!
+              </Label>
+              <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
+                <Button
+                  onClick={() => {
+                    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+                    window.open(
+                      `${apiUrl}/student/certificate/${id}/${auth?.user?._id}`,
+                      "_blank"
+                    );
+                  }}
+                  className="flex-1"
+                >
+                  <Award className="h-4 w-4 mr-2" />
+                  Download Certificate
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/student-courses")}
+                >
                   My Courses Page
                 </Button>
-                <Button onClick={handleRewatchCourse}>Rewatch Course</Button>
+                <Button variant="outline" onClick={handleRewatchCourse}>
+                  Rewatch Course
+                </Button>
               </div>
             </DialogDescription>
           </DialogHeader>

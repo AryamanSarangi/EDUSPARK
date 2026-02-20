@@ -12,8 +12,11 @@ const mediaRoutes = require("./routes/instructor-routes/media-routes");
 const instructorCourseRoutes = require("./routes/instructor-routes/course-routes");
 const studentViewCourseRoutes = require("./routes/student-routes/course-routes");
 const studentViewOrderRoutes = require("./routes/student-routes/order-routes");
+const razorpayOrderRoutes = require("./routes/student-routes/razorpay-order-routes");
 const studentCoursesRoutes = require("./routes/student-routes/student-courses-routes");
 const studentCourseProgressRoutes = require("./routes/student-routes/course-progress-routes");
+const enrollRoutes = require("./routes/student-routes/enroll-routes");
+const certificateRoutes = require("./routes/student-routes/certificate-routes");
 
 // Middleware
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
@@ -41,8 +44,11 @@ app.use("/media", mediaRoutes);
 app.use("/instructor/courses", instructorCourseRoutes);
 app.use("/student/courses", studentViewCourseRoutes);
 app.use("/student/orders", studentViewOrderRoutes);
+app.use("/student/order", razorpayOrderRoutes);
 app.use("/student/my-courses", studentCoursesRoutes);
 app.use("/student/progress", studentCourseProgressRoutes);
+app.use("/student/course", enrollRoutes);
+app.use("/student/certificate", certificateRoutes);
 
 // Health/root route
 app.get("/", (req, res) => {

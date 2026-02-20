@@ -80,7 +80,7 @@ function StudentViewCoursesPage() {
       ...filters,
       sortBy: sort,
     });
-    const response = await fetchStudentViewCourseListService(query);
+    const response = await fetchStudentViewCourseListService(query, auth?.user?._id);
     if (response?.success) {
       setStudentViewCoursesList(response?.data);
       setLoadingState(false);
